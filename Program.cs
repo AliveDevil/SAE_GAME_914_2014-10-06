@@ -1,4 +1,4 @@
-﻿//#define Dictionary
+﻿#define Dictionary
 
 using System;
 #if Dictionary
@@ -170,9 +170,11 @@ namespace Game_2014_10_06
 			{
 				case Field.Obstacle:
 					score -= 10;
+					resetFieldAtPosition(playerXPos, playerYPos);
 					break;
 				case Field.Point:
 					score += 50;
+					resetFieldAtPosition(playerXPos, playerYPos);
 					break;
 				case Field.Exit:
 					isGameOver = true;
@@ -195,7 +197,7 @@ namespace Game_2014_10_06
 				Console.Write('\0');
 			}
 			Console.SetCursorPosition(0, 0);
-			Console.WriteLine("Punkte: {0:0000} Schritte: {1:0000}", score, steps);
+			Console.Write("Punkte: {0:0000} Schritte: {1:0000}", score, steps);
 		}
 		static void drawSurround()
 		{
@@ -250,6 +252,15 @@ namespace Game_2014_10_06
 			}
 
 			return map[Height - (y + 1), x];
+		}
+		static void resetFieldAtPosition(int x, int y)
+		{
+			if (x < 0 | y < 0 | x >= Width | y >= Height)
+			{
+				return;
+			}
+
+			map[Height - (y + 1), x] = Field.None;
 		}
 	}
 }
