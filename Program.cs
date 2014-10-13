@@ -64,7 +64,7 @@ namespace Game_2014_10_06
 		{
 			Console.CursorVisible = false;
 
-			Console.WriteLine("Press [any key] to start ..");
+			writeIntro();
 			buildMap();
 			while (!isGameOver)
 			{
@@ -78,6 +78,16 @@ namespace Game_2014_10_06
 			Console.WriteLine("===");
 			Console.WriteLine("Taste zum Beenden drücken.");
 			Console.Read();
+		}
+
+		static void writeIntro()
+		{
+			Console.WriteLine("Willkommen zu einem weiteren Labyrinth im Konsolen-Stil.");
+			Console.WriteLine("Gehe durch das Labyrinth und finde den Ausgang {0}.", ExitChar);
+			Console.WriteLine("Auf deinem Weg findest du Punkte {0} (+50 Punkte im Score) und Hindernisse {1} (-10 Punkte im Score).", PointChar, ObstacleChar);
+			Console.WriteLine("Wer hat die meisten Punkte mit den wenigsten Schritten?");
+			Console.WriteLine();
+			Console.WriteLine("Drücke eine beliebige Taste zum Starten.");
 		}
 
 #if !Dictionary
