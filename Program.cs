@@ -1,4 +1,4 @@
-﻿#define Dictionary
+﻿//#define Dictionary
 
 using System;
 #if Dictionary
@@ -32,6 +32,7 @@ namespace Game_2014_10_06
 		static int playerXPos, playerYPos, score, steps;
 		static bool isGameOver;
 		static Field MovableFieldTypes = Field.None | Field.Entrance | Field.Point | Field.Obstacle | Field.Exit;
+		static bool firstRun;
 
 #if Dictionary
 		static Dictionary<Field, char> output = new Dictionary<Field, char>()
@@ -64,26 +65,27 @@ namespace Game_2014_10_06
 		{
 			Console.CursorVisible = false;
 
-			writeIntro();
-			buildMap();
+			firstRun = true;
+			WriteIntro();
+			BuildMap();
 			while (!isGameOver)
 			{
-				doInput();
-				performCheck();
-				drawMap();
+				DoInput();
+				PerformCheck();
+				DrawMap();
 			}
 			Console.Clear();
 			Console.SetCursorPosition(0, 0);
 			Console.WriteLine("Dein Punktestand: {0}\nBenötigte Schritte: {1}", score, steps);
 			Console.WriteLine("===");
 			Console.WriteLine("Taste zum Beenden drücken.");
-			Console.Read();
+			Console.ReadKey();
 		}
 
-		static void writeIntro()
+		static void WriteIntro()
 		{
 			Console.WriteLine("Willkommen zu einem weiteren Labyrinth im Konsolen-Stil.");
-			Console.WriteLine("Gehe durch das Labyrinth und finde den Ausgang {0}.", ExitChar);
+			Console.WriteLine("Gehe (mit WASD bzw. den Pfeiltasten) durch das Labyrinth und finde den Ausgang {0}.", ExitChar);
 			Console.WriteLine("Auf deinem Weg findest du Punkte {0} (+50 Punkte im Score) und Hindernisse {1} (-10 Punkte im Score).", PointChar, ObstacleChar);
 			Console.WriteLine("Wer hat die meisten Punkte mit den wenigsten Schritten?");
 			Console.WriteLine();
@@ -91,9 +93,9 @@ namespace Game_2014_10_06
 		}
 
 #if !Dictionary
-		static char resolveType(Field type)
+		static char ResolveType(Field type)
 		{
-			switch(type)
+			switch (type)
 			{
 				case Field.Entrance:
 					return EntranceChar;
@@ -111,7 +113,7 @@ namespace Game_2014_10_06
 		}
 #endif
 
-		static void buildMap()
+		static void BuildMap()
 		{
 			for (int x = 0; x < Width; x++)
 			{
@@ -122,14 +124,14 @@ namespace Game_2014_10_06
 			}
 		}
 
-		static void doInput()
+		static void DoInput()
 		{
 			ConsoleKeyInfo key = Console.ReadKey(true);
 			switch (key.Key)
 			{
 				case ConsoleKey.W:
 				case ConsoleKey.UpArrow:
-					if (canWalk(0, 1))
+					if (CanWalk(0, 1))
 					{
 						playerYPos++;
 						steps++;
@@ -137,7 +139,7 @@ namespace Game_2014_10_06
 					break;
 				case ConsoleKey.S:
 				case ConsoleKey.DownArrow:
-					if (canWalk(0, -1))
+					if (CanWalk(0, -1))
 					{
 						playerYPos--;
 						steps++;
@@ -145,7 +147,7 @@ namespace Game_2014_10_06
 					break;
 				case ConsoleKey.D:
 				case ConsoleKey.RightArrow:
-					if (canWalk(1, 0))
+					if (CanWalk(1, 0))
 					{
 						playerXPos++;
 						steps++;
@@ -153,7 +155,7 @@ namespace Game_2014_10_06
 					break;
 				case ConsoleKey.A:
 				case ConsoleKey.LeftArrow:
-					if (canWalk(-1, 0))
+					if (CanWalk(-1, 0))
 					{
 						playerXPos--;
 						steps++;
@@ -161,12 +163,12 @@ namespace Game_2014_10_06
 					break;
 			}
 		}
-		static bool canWalk(int dX, int dY)
+		static bool CanWalk(int dX, int dY)
 		{
 			int dXPos = playerXPos + dX;
 			int dYPos = playerYPos + dY;
 
-			if (MovableFieldTypes.HasFlag(fieldAtPosition(dXPos, dYPos)))
+			if (MovableFieldTypes.HasFlag(FieldAtPosition(dXPos, dYPos)))
 			{
 				return true;
 			}
@@ -174,17 +176,17 @@ namespace Game_2014_10_06
 			return false;
 		}
 
-		static void performCheck()
+		static void PerformCheck()
 		{
-			switch (fieldAtPosition(playerXPos, playerYPos))
+			switch (FieldAtPosition(playerXPos, playerYPos))
 			{
 				case Field.Obstacle:
 					score -= 10;
-					resetFieldAtPosition(playerXPos, playerYPos);
+					ResetFieldAtPosition(playerXPos, playerYPos);
 					break;
 				case Field.Point:
 					score += 50;
-					resetFieldAtPosition(playerXPos, playerYPos);
+					ResetFieldAtPosition(playerXPos, playerYPos);
 					break;
 				case Field.Exit:
 					isGameOver = true;
@@ -192,14 +194,19 @@ namespace Game_2014_10_06
 			}
 		}
 
-		static void drawMap()
+		static void DrawMap()
 		{
-			drawStats();
-			drawSurround();
-			drawEntities();
-			drawPlayer();
+			if (firstRun)
+			{
+				firstRun = false;
+				Console.Clear();
+			}
+			DrawStats();
+			DrawSurround();
+			DrawEntities();
+			DrawPlayer();
 		}
-		static void drawStats()
+		static void DrawStats()
 		{
 			for (int i = 0; i < Console.BufferWidth; i++)
 			{
@@ -209,28 +216,28 @@ namespace Game_2014_10_06
 			Console.SetCursorPosition(0, 0);
 			Console.Write("Punkte: {0:0000} Schritte: {1:0000}", score, steps);
 		}
-		static void drawSurround()
+		static void DrawSurround()
 		{
-			drawTopBottom();
-			drawLeftRight();
+			DrawTopBottom();
+			DrawLeftRight();
 		}
-		static void drawTopBottom()
+		static void DrawTopBottom()
 		{
 			for (int x = 0; x < Width + 2; x++)
 			{
-				drawItem(x, 0, FullBlockChar);
-				drawItem(x, Height + 1, FullBlockChar);
+				DrawItem(x, 0, FullBlockChar);
+				DrawItem(x, Height + 1, FullBlockChar);
 			}
 		}
-		static void drawLeftRight()
+		static void DrawLeftRight()
 		{
 			for (int y = 0; y < Height + 2; y++)
 			{
-				drawItem(0, y, FullBlockChar);
-				drawItem(Width + 1, y, FullBlockChar);
+				DrawItem(0, y, FullBlockChar);
+				DrawItem(Width + 1, y, FullBlockChar);
 			}
 		}
-		static void drawEntities()
+		static void DrawEntities()
 		{
 			for (int x = 0; x < Width; x++)
 			{
@@ -239,22 +246,22 @@ namespace Game_2014_10_06
 #if Dictionary
 					drawItem(x + 1, y + 1, output[map[y, x]]);
 #else
-					drawItem(x + 1, y + 1, resolveType(map[y, x]));
+					DrawItem(x + 1, y + 1, ResolveType(map[y, x]));
 #endif
 				}
 			}
 		}
-		static void drawPlayer()
+		static void DrawPlayer()
 		{
-			drawItem(playerXPos + 1, Height - playerYPos, PlayerChar);
+			DrawItem(playerXPos + 1, Height - playerYPos, PlayerChar);
 		}
 
-		static void drawItem(int x, int y, char @char)
+		static void DrawItem(int x, int y, char @char)
 		{
 			Console.SetCursorPosition(x, y + 3);
 			Console.Write(@char);
 		}
-		static Field fieldAtPosition(int x, int y)
+		static Field FieldAtPosition(int x, int y)
 		{
 			if (x < 0 | y < 0 | x >= Width | y >= Height)
 			{
@@ -263,7 +270,7 @@ namespace Game_2014_10_06
 
 			return map[Height - (y + 1), x];
 		}
-		static void resetFieldAtPosition(int x, int y)
+		static void ResetFieldAtPosition(int x, int y)
 		{
 			if (x < 0 | y < 0 | x >= Width | y >= Height)
 			{
